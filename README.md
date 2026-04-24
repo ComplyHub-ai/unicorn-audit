@@ -1,6 +1,6 @@
 # Unicorn Audit Trail
 
-> Angela's narrative record of reconciliations between the codebase, the
+> Carl's narrative record of reconciliations between the codebase, the
 > KB, and reality. Not visible to the team. Not synced anywhere automatic.
 >
 > This repo exists to give "on my terms" commit history and tags for
