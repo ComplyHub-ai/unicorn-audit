@@ -77,7 +77,7 @@ Create `audit/YYYY-MM-DD-<slug>.md` with this shape:
 - Things you noticed but didn't action this time
 
 ## Tag
-audit-YYYY-MM-DD  (or remix-YYYY-MM-DD for remixes)
+audit-YYYY-MM-DD-<slug>  (or remix-YYYY-MM-DD-<slug> for remixes)
 ```
 
 ---
@@ -95,13 +95,15 @@ audit(<scope>): <short summary>
 
 KB: unicorn-kb@<sha> (if KB changed)
 Code: unicorn@<sha> (always — the SHA at time of audit)
-Tag: audit-YYYY-MM-DD
+Tag: audit-YYYY-MM-DD-<slug>
 ```
 
 **Tag format:**
-- `audit-YYYY-MM-DD` — general audits.
-- `remix-YYYY-MM-DD` — post-Lovable-remix reconciliations specifically.
+- `audit-YYYY-MM-DD-<slug>` — general audits. Slug matches the audit filename so multiple audits on the same day stay distinguishable.
+- `remix-YYYY-MM-DD-<slug>` — post-Lovable-remix reconciliations specifically.
 - `adr-NNN` — point-in-time of a specific ADR resolution (optional).
+
+Earlier audits used a bare `audit-YYYY-MM-DD` form when only one audit landed on a given date. New audits should always use the slug suffix; old tags are left as-is.
 
 Tag on `main` after the merge commit.
 
