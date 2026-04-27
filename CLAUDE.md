@@ -51,7 +51,8 @@ Before doing anything else:
    auto-merge — stop after PR creation per the workspace-root
    `CLAUDE.md → Session end ritual`.
 7. After PR merges to `main`: tag the merge commit
-   `audit-YYYY-MM-DD` (or `remix-YYYY-MM-DD` for remixes) and push tags.
+   `audit-YYYY-MM-DD-<slug>` (or `remix-YYYY-MM-DD-<slug>` for remixes,
+   slug matching the audit filename) and push tags.
 8. Append the audit to `INDEX.md` (can be in the same PR or a follow-up).
 9. Surface any KB-worthy insights from this session that haven't yet
    landed in `unicorn-kb/` — draft ready-to-paste text per the "Push
