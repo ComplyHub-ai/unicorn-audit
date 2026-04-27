@@ -1,7 +1,8 @@
 # Unicorn Audit Trail
 
 > Carl's narrative record of reconciliations between the codebase, the
-> KB, and reality. Not visible to the team. Not synced anywhere automatic.
+> KB, and reality. Public repo (anyone in the org can read), but
+> Carl-authored only — no PRs from others. Not synced anywhere automatic.
 >
 > This repo exists to give "on my terms" commit history and tags for
 > moments when something was audited, reconciled, or consciously decided —
@@ -16,7 +17,7 @@ unicorn-audit/
 ├── README.md              ← this file
 ├── CLAUDE.md              ← session rituals for Claude Code in this repo
 ├── INDEX.md               ← chronological list of audits
-└── audits/
+└── audit/                 ← (singular — historical, predates rename consideration)
     └── YYYY-MM-DD-<slug>.md
 ```
 
@@ -48,7 +49,7 @@ signal drowns; too few and the point is lost.
 
 ## Template
 
-Create `audits/YYYY-MM-DD-<slug>.md` with this shape:
+Create `audit/YYYY-MM-DD-<slug>.md` with this shape:
 
 ```markdown
 # Audit: YYYY-MM-DD — <slug>
