@@ -111,7 +111,7 @@ Tag on `main` after the merge commit.
 
 - All audits: `git log --grep="audit:" --oneline`
 - All remixes: `git tag --list "remix-*"`
-- Latest audit: `ls -t audits/ | head -1`
+- Latest audit: `ls -t audit/ | head -1`
 - Search for a topic: `git log --grep="<keyword>" --all`
 
 INDEX.md is a human-readable chronological list; keep it updated as a

@@ -64,7 +64,7 @@ Before doing anything else:
 When reasoning during an audit:
 1. Actual codebase at `../unicorn/` via filesystem read.
 2. `../unicorn-kb/` via filesystem read.
-3. Previous audit docs in `audits/` for historical context.
+3. Previous audit docs in `audit/` for historical context.
 4. Inference — flag with "Inferring from …".
 
 When the codebase and KB disagree, the codebase wins and the divergence
