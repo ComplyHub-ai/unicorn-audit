@@ -6,6 +6,13 @@ the seven days ending 2026-04-25. No KB or codebase edits made. Goal
 was to surface themes, risk-bearing changes, and items future-me should
 be able to find via `git log --grep="audit:"`.
 
+> **⚠️ Errata — see [Errata](#errata) section at the bottom.** Two
+> findings below were drafted from commit messages and diffstats only;
+> when those claims were checked against actual file contents at HEAD
+> while preparing `unicorn-kb` PR #10, two of them did not survive
+> contact with the code. The original text is preserved below for
+> audit-trail integrity; corrections are appended at the end.
+
 ---
 
 ## Findings
@@ -148,3 +155,101 @@ be able to find via `git log --grep="audit:"`.
 ## Tag
 
 `audit-2026-04-27-codebase-week-review`
+
+---
+
+## Errata
+
+Added 2026-04-27, after the original sections were drafted. Surfaced
+while grounding `unicorn-kb` PR #10
+(<https://github.com/ComplyHub-ai/unicorn-kb/pull/10>) in actual file
+diffs rather than commit messages. Original findings retained above
+unchanged for audit-trail integrity.
+
+### Correction 1 — "Architectural shift: audit creation moved … to a Supabase Edge Function"
+
+**Original claim** (Findings + "Open questions parked" + Codebase
+observations): commit `65c426aa` (2026-04-20 06:56 UTC) routed audit
+creation to a new `create-client-audit` Edge Function, and the next
+`lovable-to-codebase.md` run should capture this.
+
+**What is actually at HEAD (`cf8d1314`):** the commit
+`084a5e17` ("Reverted to commit 9e51603…") on the same day
+(2026-04-20 07:58 UTC, ~1 hour later) **deleted the
+`supabase/functions/create-client-audit/` directory and reverted the
+matching changes to `src/hooks/useClientAudits.ts`**. At HEAD the file
+does not exist (`ls supabase/functions/create-client-audit/` →
+not-found) and `useClientAudits.ts` does direct
+`.from('client_audits').insert(...)` from the client. Audit-mutation
+pattern is unchanged from before the window: client-side direct DB
+writes via the Supabase JS client.
+
+**Implication for the parked KB-update items:**
+- "Audit creation Edge Function … not yet reflected in
+  `codebase-state/`" — there is nothing to reflect; the function does
+  not exist.
+- The architectural-shift framing in the audit summary is wrong. Server
+  routing of audit creation remains a greenfield decision, not a
+  shipped change.
+
+### Correction 2 — "Multitenancy / RLS hardening landed alongside the audit work"
+
+**Original claim** (Findings, "Open questions parked"): phantom tenant
+column removed (`1939b225`), tenant resolution fixed (`50b7cb58`),
+admin-RPC overhaul (`faafacb2`), three new Supabase migrations — framed
+as a coherent multitenancy / RLS theme.
+
+**What the diffs actually show:**
+- `1939b225` "Removed phantom tenant col." — touched only
+  `supabase/functions/create-client-audit/index.ts`. That file was
+  reverted later the same day (see Correction 1), so this commit is
+  effectively a no-op at HEAD.
+- `50b7cb58` "Fixed tenant resolution logic" — 8 lines changed in
+  `src/pages/NewSuggestionForm.tsx`. UI bug fix in the suggestions
+  form, not multi-tenancy plumbing.
+- `faafacb2` "Added admin RPCs & overhaul" — Academy-specific. Touched
+  `src/components/academy/admin/EnrolmentProgressDrawer.tsx`,
+  `NewEnrolmentModal.tsx`, `useAcademyEnrollments.ts`,
+  `AcademyEnrolmentsPage.tsx`, `src/integrations/supabase/types.ts`,
+  and added migration `20260421085406_b2a157f8-…sql` defining
+  `fn_academy_enrollment_stats` and `fn_academy_enrollment_lesson_detail`.
+  Both new RPCs gated by `is_vivacity()`. Not a general admin layer
+  change.
+- The three new migrations are not RLS / tenancy:
+  - `20260421082533_da37ce62-…sql` — `fn_academy_rule_dashboard_stats`
+    (Academy package-rule dashboard tiles).
+  - `20260421085406_b2a157f8-…sql` — Academy enrolments admin RPC pack
+    (per `faafacb2`).
+  - `20260423093423_781c87e1-…sql` — `fn_package_stream` helper +
+    duplicate-stream guard added to `start_client_package`. Packages
+    domain.
+
+**Correct rollup of the week's backend work:** two Academy admin RPC
+migrations driven by an admin-tooling overhaul of the Enrolments
+manager, plus one Packages migration adding a duplicate-stream guard.
+No RLS migrations, no general-admin RPC overhaul, no tenancy plumbing
+changes that survived to HEAD.
+
+### Items unchanged
+
+The other findings (audit-workspace evolution, autosave fix,
+preliminary summary, risk rating, three-phase lifecycle now confirmed
+present, catalog/integrations work, onboarding UX, "Purchasing RTO" →
+"Purchaser" rename, the 2026-04-20 revert, no human commits in the
+window) all hold up against HEAD. `unicorn-kb` PR #10 captures the
+audit workspace, Academy admin RPCs, and Packages duplicate-guard
+findings into `codebase-state/` directly.
+
+### Process note
+
+Root cause of both errors was reading commit messages + diffstats
+without opening the files. For "Routed audit creation to Edge Fn", the
+commit message was accurate at the moment the commit was authored — it
+just got reverted an hour later, and the audit's window-summary view
+didn't catch it. For the multitenancy framing, related-sounding commit
+messages got grouped into a theme without verifying any of them
+actually changed RLS or tenancy code.
+
+Future codebase-week-review audits should check final on-disk state for
+any commit cited as a "shift" or "hardening", not just the commit
+message.
