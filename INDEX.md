@@ -11,4 +11,5 @@ Newest first.
 
 ### April
 
+- [2026-04-27 — Codebase week review (2026-04-20 → 2026-04-25)](audit/2026-04-27-codebase-week-review.md) · tag: `audit-2026-04-27-codebase-week-review`
 - [2026-04-24 — KB restructure](audits/2026-04-24-kb-restructure.md) · tag: `audit-2026-04-24`
