@@ -1,8 +1,11 @@
 # Unicorn Audit Trail
 
-> Carl's narrative record of reconciliations between the codebase, the
-> KB, and reality. Public repo (anyone in the org can read), but
-> Carl-authored only — no PRs from others. Not synced anywhere automatic.
+> Narrative record of reconciliations, production DB change sessions, and
+> key decisions. Public repo (anyone in the org can read). Authorship is
+> split by session type: **Carl** authors reconciliations, remixes, and
+> standing audit narrative. **The dev who ran the session** authors Lovable
+> production DB change sessions (following `unicorn-kb/handoffs/lovable-production-db-change.md`);
+> Carl reviews those entries via PR. Not synced anywhere automatic.
 >
 > This repo exists to give "on my terms" commit history and tags for
 > moments when something was audited, reconciled, or consciously decided —
@@ -28,6 +31,9 @@ unicorn-audit/
 **Always:**
 - After a Lovable remix (see
   `../unicorn-kb/handoffs/post-lovable-remix.md`).
+- After a Lovable production DB change session (see
+  `../unicorn-kb/handoffs/lovable-production-db-change.md`) — authored by
+  the dev who ran the session; Carl reviews via PR.
 
 **Sometimes (your judgement):**
 - Resolving an Open Decision that's been open > 90 days.

@@ -1,8 +1,16 @@
 # Claude Code Session Rituals — unicorn-audit
 
-This repo is Carl's audit trail. Sessions opened here are for running
-audits and producing audit documents — **not** for editing the codebase
-or KB directly.
+This repo is the Unicorn audit trail. Authorship is split by session type:
+
+- **Carl** — reconciliations, post-remix events, and all standing audit
+  narrative. These sessions are Carl-only.
+- **Any dev (Angela, Carl, Dave, RJ, Khian)** — Lovable production DB
+  change sessions. The dev who ran the session authors the audit entry.
+  Carl reviews via PR before merge. Follow
+  `unicorn-kb/handoffs/lovable-production-db-change.md` for the full
+  workflow.
+
+Sessions opened here are for running audits and producing audit documents — **not** for editing the codebase or KB directly.
 
 If editing `unicorn/` or `unicorn-kb/` is needed mid-audit, change
 working directory to that repo, make the edits there with their own
