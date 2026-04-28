@@ -11,6 +11,7 @@ Newest first.
 
 ### April
 
+- [2026-04-28 — AcceptInvitation blank screen fix + platform-wide anti-pattern sweep](audit/2026-04-28-accept-invitation-blank-screen-fix.md) · tag: `audit-2026-04-28-accept-invitation-blank-screen-fix`
 - [2026-04-28 — ManageTenants performance investigation & React Query migration](audit/2026-04-28-manage-tenants-perf-optimisation.md) · tag: `audit-2026-04-28-manage-tenants-perf-optimisation`
 - [2026-04-28 — Staff UUID relink fix (infinite spinner, 108 FK CASCADE)](audit/2026-04-28-staff-uuid-relink-fix.md) · tag: `audit-2026-04-28-staff-uuid-relink-fix`
 - [2026-04-28 — Clean Architecture proposal review + audit-repo reconciliation](audit/2026-04-28-clean-arch-proposal-and-audit-reality.md) · tag: `audit-2026-04-28`
