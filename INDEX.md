@@ -11,6 +11,7 @@ Newest first.
 
 ### April
 
+- [2026-04-29 — audit_type full session: constraint fix, filter dropdown, edge function labels, dd_audit_type conversion (Dave direction)](audit/2026-04-29-audit-type-fixes-and-dd-conversion.md) · tag: `audit-2026-04-29-audit-type-fixes-and-dd-conversion` · author: Khian (Brian)
 - [2026-04-29 — Ask Viv full restoration (V4 compliance-assistant — 3 bugs fixed, 5 prompts verified)](audit/2026-04-29-ask-viv-restoration.md) · tag: `audit-2026-04-29-ask-viv-restoration`
 - [2026-04-29 — Audit workspace sidebar UX fixes (dead `isSelected` prop + false sidebar highlight)](audit/2026-04-29-audit-workspace-sidebar-ux-fixes.md) · tag: `audit-2026-04-29-audit-workspace-sidebar-ux-fixes`
 - [2026-04-29 — `client_audits.audit_type` CHECK constraint gap (`due_diligence_combined` missing)](audit/2026-04-29-client-audits-audit-type-constraint.md) · tag: `audit-2026-04-29-client-audits-audit-type-constraint`
