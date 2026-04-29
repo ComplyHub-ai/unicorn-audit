@@ -11,6 +11,7 @@ Newest first.
 
 ### April
 
+- [2026-04-29 — `client_audits.audit_type` CHECK constraint gap (`due_diligence_combined` missing)](audit/2026-04-29-client-audits-audit-type-constraint.md) · tag: `audit-2026-04-29-client-audits-audit-type-constraint`
 - [2026-04-28 — AcceptInvitation blank screen fix + platform-wide anti-pattern sweep](audit/2026-04-28-accept-invitation-blank-screen-fix.md) · tag: `audit-2026-04-28-accept-invitation-blank-screen-fix`
 - [2026-04-28 — ManageTenants performance investigation & React Query migration](audit/2026-04-28-manage-tenants-perf-optimisation.md) · tag: `audit-2026-04-28-manage-tenants-perf-optimisation`
 - [2026-04-28 — Staff UUID relink fix (infinite spinner, 108 FK CASCADE)](audit/2026-04-28-staff-uuid-relink-fix.md) · tag: `audit-2026-04-28-staff-uuid-relink-fix`
