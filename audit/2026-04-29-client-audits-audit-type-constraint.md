@@ -3,8 +3,8 @@
 **Author:** Brian  
 **Trigger:** ad-hoc — `due_diligence_combined` audit creation was silently blocked at the DB layer  
 **Scope:** `client_audits` schema (CHECK constraint on `audit_type`), all frontend consumers of `audit_type`, `NewAuditModal.tsx` wizard, `useTenantsBasic` / `ManageTenants.tsx` pagination removal (bundled fix)  
-**Codebase verified at:** `unicorn-cms-f09c59e5@681758b0`  
-**Session start (local HEAD):** `unicorn-cms-f09c59e5@c08d8cd2` — was behind `origin/main`; pulled at session end to verify fix
+**Codebase verified at:** `unicorn-cms-f09c59e5@732d788f`  
+**Session start (local HEAD):** `unicorn-cms-f09c59e5@c08d8cd2` — was behind `origin/main`; pulled multiple times during session as fixes landed
 
 ---
 
@@ -49,11 +49,62 @@ The `v_audit_schedule` view intentionally only tracks the three CHC types — du
 
 ## Finding 3 — Two pre-existing frontend gaps (not caused by the constraint, not blocking)
 
-1. **`AuditsAssessments.tsx` filter dropdown** (`src/pages/AuditsAssessments.tsx:115-118`) has `compliance_health_check`, `mock_audit`, and `due_diligence` as filter options but no `due_diligence_combined`. Combined DD audits are visible under "All Types" but cannot be filtered specifically. Cosmetic UX gap only.
+Both gaps were identified during the blast-radius check, noted as cosmetic-only, and closed in follow-up Lovable prompts the same session.
 
-2. **`research-audit-intelligence` edge function** (`supabase/functions/research-audit-intelligence/index.ts:26-32`) has its own `AUDIT_TYPE_LABELS` covering only legacy ASQA audit types (`initial_registration`, `re_registration`, etc.). If invoked with a `client_audits` audit type it falls back to the raw string (`AUDIT_TYPE_LABELS[audit_type] || audit_type`). No error risk; label display only.
+### Gap A — `AuditsAssessments.tsx` filter dropdown incomplete
 
-Neither gap was introduced by this change. Both are candidates for a follow-up Lovable prompt.
+**State at discovery:** `src/pages/AuditsAssessments.tsx:115-118` had only three filter options (`compliance_health_check`, `mock_audit`, `due_diligence`). The remaining four `AuditType` values — `cricos_chc`, `rto_cricos_chc`, `cricos_mock_audit`, `due_diligence_combined` — were absent. Audits of those types were visible under "All Types" but could not be filtered specifically.
+
+**Fix (`a2464926`, 29 Apr 2026):** Four `SelectItem` entries added in one commit. Scope: `AuditsAssessments.tsx` only, +4 lines, no state or data changes.
+
+**Post-fix state:** All 7 `AuditType` values are now selectable filter options.
+
+---
+
+### Gap B — `research-audit-intelligence` edge function label map incomplete + label mismatch
+
+**State at discovery:** The edge function's `AUDIT_TYPE_LABELS` (lines 26–32) covered only 5 legacy ASQA audit types (`initial_registration`, `re_registration`, `extension_to_scope`, `strategic_review`, `post_audit_response`). When called with any `client_audits` audit type — `compliance_health_check`, `due_diligence_combined`, etc. — the function fell back to the raw enum string. The raw string appeared in the Perplexity AI prompt and in the `**Audit Type:**` header line of every generated intelligence pack stored to `audit_intelligence_packs.summary_markdown`.
+
+A blast-radius check confirmed: (a) `AUDIT_TYPE_LABELS` is read in exactly one place in the file (`const auditLabel = AUDIT_TYPE_LABELS[audit_type] || audit_type`), (b) `auditLabel` feeds only the AI prompt text and the report header — both staff-only surfaces, no client-facing exposure, (c) no other edge function has an equivalent label map, (d) no branching on `audit_type` values exists elsewhere in the file.
+
+**Fix part 1 (`2c18696d`, 29 Apr 2026):** All 7 `AuditType` values added to the map:
+
+```ts
+compliance_health_check: "CHC",        // ← label was wrong — see Finding 4
+cricos_chc:              "CHC — CRICOS",
+rto_cricos_chc:          "CHC — RTO + CRICOS",
+mock_audit:              "Mock Audit",
+cricos_mock_audit:       "Mock Audit — CRICOS",
+due_diligence:           "Due Diligence",
+due_diligence_combined:  "Combined RTO + CRICOS Due Diligence",
+```
+
+**Fix part 2 (`732d788f`, 29 Apr 2026):** `compliance_health_check` label corrected from `"CHC"` to `"CHC — RTO"` — see Finding 4 below.
+
+**Post-fix state:** All 12 keys present (5 legacy ASQA + 7 `AuditType`). Labels match `src/types/clientAudits.ts` exactly.
+
+---
+
+## Finding 4 — Label mismatch: `"CHC"` vs `"CHC — RTO"` across three maps
+
+When Lovable added the 7 `AuditType` values to the edge function's `AUDIT_TYPE_LABELS` (Fix part 1 above), it chose `"CHC"` for `compliance_health_check`. A cross-map audit immediately after the pull found the label is not consistent across the codebase:
+
+| Location | `compliance_health_check` label | Purpose |
+|----------|--------------------------------|---------|
+| `src/types/clientAudits.ts` (`AUDIT_TYPE_LABELS`) | `"CHC — RTO"` | **Canonical** — used by `AuditTypeBadge`, `ClientAuditReportsSection`, `buildPreliminaryAuditSummary` |
+| `src/hooks/useClientAudits.ts` (`AUDIT_TYPE_HUMAN`) | `"Compliance Health Check"` | Audit title generation only — intentionally different |
+| `src/pages/AuditsAssessments.tsx` (filter dropdown) | `"CHC"` | Filter chip label — short form, acceptable in context |
+| `src/components/audit/NewAuditModal.tsx` (card labels) | `"SRTO 2025 — Annual CHC"` / `"SRTO 2025 only — CHC"` | Picker context only |
+| `supabase/functions/research-audit-intelligence/index.ts` | `"CHC"` ← **before fix** | Staff-only report header and AI prompt |
+
+The `"CHC"` label from the edge function was not client-facing (intelligence packs have no `report_client_visible` flag and no client portal route). However, it created an inconsistency between the report header (`**Audit Type:** CHC`) and every other staff UI surface where the same audit type displays as `CHC — RTO`.
+
+**Fix (`732d788f`, 29 Apr 2026):** One-line change — `"CHC"` → `"CHC — RTO"` in the edge function map. Confirmed identical to canonical source.
+
+**Why this happened:** The edge function cannot import from `src/` (Deno runtime). Lovable had no reference to compare against and chose a shorter form. There is no mechanism today that would catch this divergence automatically.
+
+**Prevention rule (do not reproduce):**
+> The edge function `AUDIT_TYPE_LABELS` is a manually maintained copy of the canonical map in `src/types/clientAudits.ts`. Whenever `AuditType` gains a new value OR an existing label is renamed in `src/types/clientAudits.ts`, the edge function map must be updated in the same Lovable prompt to match exactly. Before approving any Lovable fix that touches either map, cross-check every key against the other. The canonical source is always `src/types/clientAudits.ts`.
 
 ---
 
@@ -123,6 +174,9 @@ No KB changes this session.
 ## Codebase observations (read-only)
 
 - `unicorn-cms-f09c59e5@681758b0` — constraint fix live; `due_diligence_combined` now insertable; ManageTenants pagination removed; NewAuditModal registration detection hardened.
+- `unicorn-cms-f09c59e5@a2464926` — `AuditsAssessments.tsx` filter dropdown extended to all 7 `AuditType` values (Gap A closed).
+- `unicorn-cms-f09c59e5@2c18696d` — edge function `AUDIT_TYPE_LABELS` extended with all 7 `AuditType` values; `AskVivPanel.tsx` gains `reasoning_tiers`, `governance`, `validation` fields (unrelated).
+- `unicorn-cms-f09c59e5@732d788f` — edge function `compliance_health_check` label corrected from `"CHC"` to `"CHC — RTO"` (Gap B + Finding 4 closed).
 
 ---
 
@@ -134,7 +188,8 @@ None drafted or resolved this session.
 
 ## Open questions parked
 
-- Two frontend gaps (filter dropdown, edge function label) are not blocking but should be addressed in a follow-up Lovable prompt.
+- ~~Two frontend gaps (filter dropdown, edge function label) — closed this session.~~ Both resolved; see Findings 3 and 4.
+- `AuditIntelligencePackPanel.tsx` (`src/components/tenant/AuditIntelligencePackPanel.tsx:32-38`) has its own local `AUDIT_TYPE_LABELS` covering only the 5 legacy ASQA types. This is a third copy of the map. The "Generate Intelligence Pack" dropdown therefore only offers legacy ASQA audit types — none of the current `client_audits` types appear. Confirm with Angela whether the feature is intended to support `client_audits` types before prompting Lovable. If yes, replace the local map with an import from `src/types/clientAudits.ts`.
 - No CI check enforces the `AuditType` union ↔ DB constraint pairing. A TypeScript test that enumerates `AuditType` values and asserts they match the constraint list would prevent recurrence — worth raising if a test suite is ever added.
 - `fetchPackages()`, `fetchCSCOptions()`, `checkConnectedTenant()`, `fetchCodeTables()` in `ManageTenants.tsx` remain as bare `useEffect` fetches — carried over from the 2026-04-28 audit as still-open.
 
