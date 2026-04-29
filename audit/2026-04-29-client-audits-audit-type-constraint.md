@@ -167,7 +167,7 @@ New audit types were added to the frontend `AuditType` union over time without c
 
 ## KB changes shipped
 
-No KB changes this session.
+- `unicorn-kb@55f5d30` — `reference/dev-guardrails.md`: Trap 6 (AuditType label map drift — three-map inventory, canonical source rule, CHC mismatch origin) and Trap 7 (AuditType DB constraint gap — verification SQL, current allowed-values list). PR: ComplyHub-ai/unicorn-kb#22.
 
 ---
 
