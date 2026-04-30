@@ -11,6 +11,7 @@ Newest first.
 
 ### April
 
+- [2026-04-30 — Angela's AI Executive Summary Drafter & multi-framework corpus (26 commits, 2 migrations, 2 edge functions + patches)](audit/2026-04-30-angela-ai-executive-summary-multi-framework-corpus.md) · tag: `audit-2026-04-30-angela-ai-executive-summary-multi-framework-corpus`
 - [2026-04-30 — Angela's AI RAG corpus, Finding Drafter & Evidence Analyser (26 commits, 4 migrations, 5 edge functions)](audit/2026-04-30-angela-ai-rag-finding-drafter-evidence-analyser.md) · tag: `audit-2026-04-30-angela-ai-rag-finding-drafter-evidence-analyser`
 - [2026-04-29 — Evidence files open/view — RLS verified, Lovable prompt issued](audit/2026-04-29-audit-documents-open-view.md) · tag: `audit-2026-04-29-audit-documents-open-view`
 - [2026-04-29 — audit_type full session: constraint fix, filter dropdown, edge function labels, dd_audit_type conversion (Dave direction)](audit/2026-04-29-audit-type-fixes-and-dd-conversion.md) · tag: `audit-2026-04-29-audit-type-fixes-and-dd-conversion` · author: Khian (Brian)
