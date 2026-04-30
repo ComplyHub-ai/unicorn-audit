@@ -11,6 +11,7 @@ Newest first.
 
 ### April
 
+- [2026-04-30 — Ask Viv client mode — edge function + frontend build (Prompts 2–5 of build-ask-viv-client-mode-v1)](audit/2026-04-30-ask-viv-client-mode-build.md) · tag: `audit-2026-04-30-ask-viv-client-mode-build`
 - [2026-04-30 — Ask Viv client mode — ai_client_query_usage migration (Prompt 1 of build-ask-viv-client-mode-v1)](audit/2026-04-30-ask-viv-client-mode-migration.md) · tag: `audit-2026-04-30-ask-viv-client-mode-migration`
 - [2026-04-30 — Angela's AI Executive Summary Drafter & multi-framework corpus (26 commits, 2 migrations, 2 edge functions + patches)](audit/2026-04-30-angela-ai-executive-summary-multi-framework-corpus.md) · tag: `audit-2026-04-30-angela-ai-executive-summary-multi-framework-corpus`
 - [2026-04-30 — Angela's AI RAG corpus, Finding Drafter & Evidence Analyser (26 commits, 4 migrations, 5 edge functions)](audit/2026-04-30-angela-ai-rag-finding-drafter-evidence-analyser.md) · tag: `audit-2026-04-30-angela-ai-rag-finding-drafter-evidence-analyser`
