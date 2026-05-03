@@ -9,6 +9,10 @@ Newest first.
 
 ## 2026
 
+### May
+
+- [2026-05-04 — Angela's client portal rebuild, package dashboard, invitations overhaul, RLS hardening (296 commits, 23 migrations)](audit/2026-05-04-angela-client-portal-packages-invitations.md) · tag: `audit-2026-05-04-angela-client-portal-packages-invitations`
+
 ### April
 
 - [2026-04-30 — Ask Viv client mode — edge function + frontend build (Prompts 2–5 of build-ask-viv-client-mode-v1)](audit/2026-04-30-ask-viv-client-mode-build.md) · tag: `audit-2026-04-30-ask-viv-client-mode-build`
