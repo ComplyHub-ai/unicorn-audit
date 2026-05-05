@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-06 — Suggestion Register client portal — is_client_visible flag, 4 migrations, RLS hardening, notify edge function, client portal pages](audit/2026-05-06-suggest-register-client-portal.md) · tag: `audit-2026-05-06-suggest-register-client-portal`
 - [2026-05-05 — Ask Viv client Gemini integration — replaced deterministic formatter with Gemini, fixed two silent tasks tenant_id bugs](audit/2026-05-05-ask-viv-client-gemini-integration.md) · tag: `audit-2026-05-05-ask-viv-client-gemini-integration`
 - [2026-05-04 — Angela's client portal rebuild, package dashboard, invitations overhaul, RLS hardening (296 commits, 23 migrations)](audit/2026-05-04-angela-client-portal-packages-invitations.md) · tag: `audit-2026-05-04-angela-client-portal-packages-invitations`
 
