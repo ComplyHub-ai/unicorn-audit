@@ -11,6 +11,8 @@ Newest first.
 
 ### May
 
+- [2026-05-06 — CSC card "Not yet assigned" RLS fix — missing users_select_assigned_csc policy on users table](audit/2026-05-06-csc-card-not-yet-assigned-rls-fix.md) · tag: `audit-2026-05-06-csc-card-not-yet-assigned-rls-fix` · author: Khian (Brian)
+- [2026-05-06 — Invite acceptance tenant_members fix — accept_invitation_v2 extended, 416-row backfill (83 active restored, 333 inactive)](audit/2026-05-06-invite-acceptance-tenant-members-fix.md) · tag: `audit-2026-05-06-invite-acceptance-tenant-members-fix` · author: Khian (Brian)
 - [2026-05-06 — Messaging RLS cutover — tenant_messages wired, participant-scoped RLS, audit triggers, Help Center CSC unified, 15 live CI tests](audit/2026-05-06-messaging-rls-cutover.md) · tag: `audit-2026-05-06-messaging-rls-cutover`
 - [2026-05-06 — Suggestion Register client portal — is_client_visible flag, 4 migrations, RLS hardening, notify edge function, client portal pages](audit/2026-05-06-suggest-register-client-portal.md) · tag: `audit-2026-05-06-suggest-register-client-portal`
 - [2026-05-05 — Ask Viv client Gemini integration — replaced deterministic formatter with Gemini, fixed two silent tasks tenant_id bugs](audit/2026-05-05-ask-viv-client-gemini-integration.md) · tag: `audit-2026-05-05-ask-viv-client-gemini-integration`
