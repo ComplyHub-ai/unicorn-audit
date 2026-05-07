@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-07 — Angela security hardening — auth_tokens, profiles, eos_workspaces, task-evidence, task-files, views security_invoker (7 fixes, 1 accepted legacy risk)](audit/2026-05-07-angela-security-hardening-rls-storage-views.md) · tag: `audit-2026-05-07-angela-security-hardening-rls-storage-views` · author: Khian (Brian)
 - [2026-05-06 — CSC card "Not yet assigned" RLS fix — missing users_select_assigned_csc policy on users table](audit/2026-05-06-csc-card-not-yet-assigned-rls-fix.md) · tag: `audit-2026-05-06-csc-card-not-yet-assigned-rls-fix` · author: Khian (Brian)
 - [2026-05-06 — Invite acceptance tenant_members fix — accept_invitation_v2 extended, 416-row backfill (83 active restored, 333 inactive)](audit/2026-05-06-invite-acceptance-tenant-members-fix.md) · tag: `audit-2026-05-06-invite-acceptance-tenant-members-fix` · author: Khian (Brian)
 - [2026-05-06 — Messaging RLS cutover — tenant_messages wired, participant-scoped RLS, audit triggers, Help Center CSC unified, 15 live CI tests](audit/2026-05-06-messaging-rls-cutover.md) · tag: `audit-2026-05-06-messaging-rls-cutover`
