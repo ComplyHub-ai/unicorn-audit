@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-07 — Day 2 messaging unread badge — realtime bell, source_id trigger fix, CSC unread dot, bell-clears-on-open, client bell realtime, Bugs 3/4/5 resolved](audit/2026-05-07-day2-messaging-unread-badge.md) · tag: `audit-2026-05-07-day2-messaging-unread-badge` · author: Brian
 - [2026-05-07 — Client home "Message" button routed to CSC tab — two `openHelpCenter("chatbot")` → `openHelpCenter("csc")` swaps in `ClientHomePage.tsx`](audit/2026-05-07-client-home-message-csc-tab-fix.md) · tag: `audit-2026-05-07-client-home-message-csc-tab-fix` · author: Khian (Brian)
 - [2026-05-07 — Angela security hardening — auth_tokens, profiles, eos_workspaces, task-evidence, task-files, views security_invoker (7 fixes, 1 accepted legacy risk)](audit/2026-05-07-angela-security-hardening-rls-storage-views.md) · tag: `audit-2026-05-07-angela-security-hardening-rls-storage-views` · author: Khian (Brian)
 - [2026-05-06 — CSC card "Not yet assigned" RLS fix — missing users_select_assigned_csc policy on users table](audit/2026-05-06-csc-card-not-yet-assigned-rls-fix.md) · tag: `audit-2026-05-06-csc-card-not-yet-assigned-rls-fix` · author: Khian (Brian)
