@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-08 — Messaging unread/read visibility + nav badge inflation + Direct label — staff/client unread row contrast, badge scoped to participant-only convos + realtime clear fix, "Message your CSC" subject replaced with "Direct message" in staff view](audit/2026-05-08-messaging-unread-badge-direct-label.md) · tag: `audit-2026-05-08-messaging-unread-badge-direct-label` · author: Khian (Brian)
 - [2026-05-08 — Client packages action buttons fix — "Open Tasks" routed to staff route (→ homepage), "Messages CSC" triggered mailto popup; both fixed to correct client portal routes, dead code removed](audit/2026-05-08-client-packages-action-buttons-fix.md) · tag: `audit-2026-05-08-client-packages-action-buttons-fix` · author: Khian (Brian)
 - [2026-05-08 — Bug 2 + Bug 12 — dedupe_key index cleanup (drop duplicate partial index, keep both arbiters) + Today's Focus smoke-test close](audit/2026-05-08-bug2-bug12-dedupe-index-cleanup.md) · tag: `audit-2026-05-08-bug2-bug12-dedupe-index-cleanup` · author: Khian (Brian)
 - [2026-05-08 — Client URL access audit — full route inventory, 13 HIGH + 8 MEDIUM unguarded staff routes, staff member enumeration via useVivacityTeamUsers, Phase 2/3 plan](audit/2026-05-08-client-url-access-audit.md) · tag: `audit-2026-05-08-client-url-access-audit`
