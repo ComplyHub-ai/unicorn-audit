@@ -1,4 +1,4 @@
-# Audit Index
+﻿# Audit Index
 
 Chronological list of audits. Git tags are the authoritative reference
 (`git tag --list "audit-*" "remix-*"`), this is the human-readable mirror.
@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-08 — Client packages action buttons fix — "Open Tasks" routed to staff route (→ homepage), "Messages CSC" triggered mailto popup; both fixed to correct client portal routes, dead code removed](audit/2026-05-08-client-packages-action-buttons-fix.md) · tag: `audit-2026-05-08-client-packages-action-buttons-fix` · author: Khian (Brian)
 - [2026-05-08 — Bug 2 + Bug 12 — dedupe_key index cleanup (drop duplicate partial index, keep both arbiters) + Today's Focus smoke-test close](audit/2026-05-08-bug2-bug12-dedupe-index-cleanup.md) · tag: `audit-2026-05-08-bug2-bug12-dedupe-index-cleanup` · author: Khian (Brian)
 - [2026-05-08 — Client URL access audit — full route inventory, 13 HIGH + 8 MEDIUM unguarded staff routes, staff member enumeration via useVivacityTeamUsers, Phase 2/3 plan](audit/2026-05-08-client-url-access-audit.md) · tag: `audit-2026-05-08-client-url-access-audit`
 - [2026-05-08 — Client packages RLS perf fix — `security_invoker` timeout root cause, RLS semi-join rewrite, SECURITY DEFINER RPC `get_client_package_dashboard`, Academy lesson count fallback](audit/2026-05-08-rls-perf-client-package-dashboard.md) · tag: `audit-2026-05-08-rls-perf-client-package-dashboard`
@@ -43,3 +44,4 @@ Newest first.
 - [2026-04-28 — Clean Architecture proposal review + audit-repo reconciliation](audit/2026-04-28-clean-arch-proposal-and-audit-reality.md) · tag: `audit-2026-04-28`
 - [2026-04-27 — Codebase week review (2026-04-20 → 2026-04-25)](audit/2026-04-27-codebase-week-review.md) · tag: `audit-2026-04-27-codebase-week-review`
 - [2026-04-24 — KB restructure](audit/2026-04-24-kb-restructure.md) · tag: `audit-2026-04-24`
+
