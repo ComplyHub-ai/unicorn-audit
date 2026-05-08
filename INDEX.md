@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-08 — Staff directory RPC hardening — get_vivacity_team_directory + get_vivacity_team_directory_staff, useVivacityTeamUsers switched to RPC, 2 duplicate raw queries removed, email/job_title no longer returned to client callers](audit/2026-05-08-staff-directory-rpc-hardening.md) · tag: `audit-2026-05-08-staff-directory-rpc-hardening`
 - [2026-05-08 — Client URL access audit — full route inventory, 13 HIGH + 8 MEDIUM unguarded staff routes, staff member enumeration via useVivacityTeamUsers, Phase 2/3 plan](audit/2026-05-08-client-url-access-audit.md) · tag: `audit-2026-05-08-client-url-access-audit`
 - [2026-05-08 — Client packages RLS perf fix — `security_invoker` timeout root cause, RLS semi-join rewrite, SECURITY DEFINER RPC `get_client_package_dashboard`, Academy lesson count fallback](audit/2026-05-08-rls-perf-client-package-dashboard.md) · tag: `audit-2026-05-08-rls-perf-client-package-dashboard`
 - [2026-05-08 — Dashboard bugs 9/10/11 + Bug 7/8 smoke-test close — label text, View Tasks nav, 999-days v_dashboard_tenant_portfolio fix (391 tenants corrected)](audit/2026-05-08-dashboard-bugs-9-10-11-fix.md) · tag: `audit-2026-05-08-dashboard-bugs-9-10-11-fix` · author: Khian (Brian)
