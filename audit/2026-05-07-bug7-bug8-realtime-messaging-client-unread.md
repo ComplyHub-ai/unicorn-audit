@@ -68,7 +68,7 @@ Three distinct root causes, all fixed in one Lovable prompt:
 ## Open questions parked
 
 - Bug 2 (three duplicate dedupe indexes on `user_notifications`) remains open. No migration written. Low urgency — write-overhead tax only, no data risk at current row count (~800 rows). Flag when `user_notifications` is next touched.
-- Smoke test for Bug 7 and Bug 8 end-to-end (deep-link path, bell clears, unread indicator clears) to be run at session start of next messaging session.
+- ~~Smoke test for Bug 7 and Bug 8 end-to-end (deep-link path, bell clears, unread indicator clears) to be run at session start of next messaging session.~~ **Closed 8 May 2026** — both bugs confirmed working in production. See `audit-2026-05-08-dashboard-bugs-9-10-11-fix`.
 
 ## Tag
 

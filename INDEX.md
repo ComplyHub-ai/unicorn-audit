@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-08 — Dashboard bugs 9/10/11 + Bug 7/8 smoke-test close — label text, View Tasks nav, 999-days v_dashboard_tenant_portfolio fix (391 tenants corrected)](audit/2026-05-08-dashboard-bugs-9-10-11-fix.md) · tag: `audit-2026-05-08-dashboard-bugs-9-10-11-fix` · author: Khian (Brian)
 - [2026-05-07 — Bug 7 + Bug 8 — CSC realtime messages + client unread/bell clear (filtered subscription root cause, source_id backfill, regression fix)](audit/2026-05-07-bug7-bug8-realtime-messaging-client-unread.md) · tag: `audit-2026-05-07-bug7-bug8-realtime-messaging-client-unread` · author: Brian
 - [2026-05-07 — Day 2 messaging unread badge — realtime bell, source_id trigger fix, CSC unread dot, bell-clears-on-open, client bell realtime, Bugs 3/4/5 resolved](audit/2026-05-07-day2-messaging-unread-badge.md) · tag: `audit-2026-05-07-day2-messaging-unread-badge` · author: Brian
 - [2026-05-07 — Client home "Message" button routed to CSC tab — two `openHelpCenter("chatbot")` → `openHelpCenter("csc")` swaps in `ClientHomePage.tsx`](audit/2026-05-07-client-home-message-csc-tab-fix.md) · tag: `audit-2026-05-07-client-home-message-csc-tab-fix` · author: Khian (Brian)
