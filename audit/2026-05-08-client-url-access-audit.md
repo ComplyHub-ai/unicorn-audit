@@ -127,11 +127,17 @@ Add `requireSuperAdmin` to `/admin/reviews` in `App.tsx` as a secondary belt-and
 2. Alternatively: create a `vivacity_team_public` view (SECURITY DEFINER) exposing only `user_uuid`, `first_name`, `last_name`, `avatar_url` — no email or job_title — and update `useVivacityTeamUsers` to query the view.
 3. Move the Create Task assignee query out of client-visible components entirely (gate `TaskAssigneeButton` / `StageStaffTasks` behind a staff-role check).
 
-## Phase 3 — Cross-check test plan
+## Phase 3 — Cross-check results
 
-After implementation, log in as a client-role user (`unicorn_role = 'User'` or `'Admin'`) and attempt to navigate to each HIGH and MEDIUM route above. Expected result for each: redirect to `/dashboard` or `/client/home`.
+**Phase 2A shipped:** unicorn-cms-f09c59e5 @ `fcb90a64` ("Applied RBAC default denies")
 
-Also verify: the Create Task assignee dropdown is either absent for client users, or — if intentionally surfaced — returns no email/job_title data.
+**Tested:** 2026-05-08, client-role user (`unicorn_role = 'User'` or `'Admin'`), browser navigation.
+
+**Result: PASS** — all HIGH and MEDIUM severity routes from the audit now redirect to `/dashboard`. Client portal routes (`/client/*`, `/dashboard`, `/settings`) continue to render correctly.
+
+**Phase 2A closed.** Route guard half of this audit is resolved.
+
+**Phase 2B still open** — staff member enumeration via `useVivacityTeamUsers` (Create Task assignee dropdown leaking staff email + job_title to client users) has not been addressed. Requires a separate session following the Lovable production DB change workflow.
 
 ---
 
