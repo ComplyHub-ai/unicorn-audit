@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-11 — Angela sessions 7–10 May — Academy impersonation backend, support tickets system, security hardening (users_update_own escalation fix, storage lockdown, security_invoker), research findings RLS, academy routes restructure (249 commits, 14 migrations)](audit/2026-05-11-angela-sessions-may7-10-academy-support.md) · tag: `audit-2026-05-11-angela-sessions-may7-10-academy-support` · author: Carl
 - [2026-05-08 — Staff directory RPC hardening — get_vivacity_team_directory + get_vivacity_team_directory_staff, useVivacityTeamUsers switched to RPC, 2 duplicate raw queries removed, email/job_title no longer returned to client callers](audit/2026-05-08-staff-directory-rpc-hardening.md) · tag: `audit-2026-05-08-staff-directory-rpc-hardening`
 - [2026-05-08 — Messaging unread/read visibility + nav badge inflation + Direct label — staff/client unread row contrast, badge scoped to participant-only convos + realtime clear fix, "Message your CSC" subject replaced with "Direct message" in staff view](audit/2026-05-08-messaging-unread-badge-direct-label.md) · tag: `audit-2026-05-08-messaging-unread-badge-direct-label` · author: Khian (Brian)
 - [2026-05-08 — Client packages action buttons fix — "Open Tasks" routed to staff route (→ homepage), "Messages CSC" triggered mailto popup; both fixed to correct client portal routes, dead code removed](audit/2026-05-08-client-packages-action-buttons-fix.md) · tag: `audit-2026-05-08-client-packages-action-buttons-fix` · author: Khian (Brian)
