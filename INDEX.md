@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-11 — Cron JWT rotation blocked — private schema + helper deployed; job command update blocked by supabase_read_only_user ownership; Supabase support ticket required](audit/2026-05-11-cron-jwt-rotation-blocked.md) · tag: `audit-2026-05-11-cron-jwt-rotation-blocked` · author: Carl
 - [2026-05-11 — Angela sessions 7–10 May — Academy impersonation backend, support tickets system, security hardening (users_update_own escalation fix, storage lockdown, security_invoker), research findings RLS, academy routes restructure (249 commits, 14 migrations)](audit/2026-05-11-angela-sessions-may7-10-academy-support.md) · tag: `audit-2026-05-11-angela-sessions-may7-10-academy-support` · author: Carl
 - [2026-05-08 — Staff directory RPC hardening — get_vivacity_team_directory + get_vivacity_team_directory_staff, useVivacityTeamUsers switched to RPC, 2 duplicate raw queries removed, email/job_title no longer returned to client callers](audit/2026-05-08-staff-directory-rpc-hardening.md) · tag: `audit-2026-05-08-staff-directory-rpc-hardening`
 - [2026-05-08 — Messaging unread/read visibility + nav badge inflation + Direct label — staff/client unread row contrast, badge scoped to participant-only convos + realtime clear fix, "Message your CSC" subject replaced with "Direct message" in staff view](audit/2026-05-08-messaging-unread-badge-direct-label.md) · tag: `audit-2026-05-08-messaging-unread-badge-direct-label` · author: Khian (Brian)
