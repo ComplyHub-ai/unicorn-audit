@@ -6,7 +6,7 @@
 
 ---
 
-## End state (as at close of session)
+## End state (as at close of session — P0 CLOSED 2026-05-12)
 
 | Artefact | Status | Note |
 |---|---|---|
@@ -15,11 +15,11 @@
 | `private.cron_function_jwt()` helper | DEPLOYED | Created this session via Studio SQL Editor |
 | Job 8 `generate-notifications-meetings-v2` | ACTIVE | Created by Lovable migration; owned by `postgres`; uses vault helper |
 | Job 9 `generate-notifications-daily-v2` | ACTIVE | Created by Lovable migration; owned by `postgres`; uses vault helper |
-| Job 1 `generate-notifications-meetings` (legacy) | STILL ACTIVE | Owned by `supabase_read_only_user`; still hard-coded JWT; awaiting Supabase support to unschedule |
-| Job 2 `generate-notifications-daily` (legacy) | STILL ACTIVE | Same |
+| Job 1 `generate-notifications-meetings` (legacy) | **REMOVED** | Supabase support transferred ownership to `postgres` (2026-05-12); removed via Lovable migration `remove_legacy_cron_jobs` |
+| Job 2 `generate-notifications-daily` (legacy) | **REMOVED** | Same |
 | ComplyHub accidental artefacts | PRESENT | `private` schema + `private.cron_function_jwt()` on `gdwhlstfguxarnxasrrs`; inert but need cleanup |
 
-**Vault rotation is live.** Jobs 8 and 9 are running on the same schedules as jobs 1 and 2 using `private.cron_function_jwt()`. The edge function is currently being invoked **twice per tick** — once by the legacy jobs (hard-coded JWT) and once by the new vault-backed jobs. Functional impact is nil (idempotent edge function); the double-firing should be stopped by unscheduling jobs 1 and 2.
+**P0 fully closed.** Jobs 1 and 2 removed. Verification query `SELECT jobid, jobname FROM cron.job WHERE command LIKE '%eyJ%'` returns 0 rows. Only jobs 8 and 9 (vault-backed) are now active. No more double-firing.
 
 ---
 
@@ -48,21 +48,17 @@
 
 ## What remains open
 
-- Jobs 1 and 2 still active and double-firing alongside jobs 8 and 9. Need unscheduling.
-- Supabase support ticket raised — asking them to unschedule jobs 1 and 2 (simpler ask than ownership transfer or command rewrite).
 - ComplyHub cleanup: drop `private.cron_function_jwt()` and `private` schema from `gdwhlstfguxarnxasrrs`. Safe to do any time; confirm no other objects exist in `private` on ComplyHub before dropping.
 
-## Unblocking path (updated)
+## Resolution path (completed 2026-05-12)
 
-Supabase support ticket is open. Updated ask — simpler than the original rotation request:
+Supabase support transferred ownership of jobs 1 and 2 from `supabase_read_only_user` to `postgres`. Once owned by `postgres`, a Lovable migration (`remove_legacy_cron_jobs`) called `cron.unschedule('generate-notifications-meetings')` and `cron.unschedule('generate-notifications-daily')` successfully.
 
-> Jobs 1 (`generate-notifications-meetings`) and 2 (`generate-notifications-daily`) on project `yxkgdalkbrriasiyyrwk` are owned by `supabase_read_only_user` and cannot be unscheduled or altered by `postgres`. We have created replacement jobs 8 and 9 on the same schedules using a vault-backed helper. We just need jobs 1 and 2 deleted/unscheduled. Can you remove them?
-
-Once Supabase unschedules jobs 1 and 2, verify with:
+Verification:
 ```sql
-SELECT jobid, jobname, command FROM cron.job WHERE command LIKE '%eyJ%';
+SELECT jobid, jobname FROM cron.job WHERE command LIKE '%eyJ%';
 ```
-Expected: 0 rows. P0 fully closed.
+Result: 0 rows. P0 closed.
 
 ## Risk note
 
