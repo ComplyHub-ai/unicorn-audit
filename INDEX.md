@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-12 — pdp_cycles RLS fix — no INSERT policy for non-staff users blocked createCycle(); UPDATE WITH CHECK prevented cycle closure; hardened INSERT (status whitelist + tenant membership) + UPDATE (under_review added to USING, completed_by guard) applied via single migration](audit/2026-05-12-pdp-cycles-rls-fix.md) · tag: `audit-2026-05-12-pdp-cycles-rls-fix` · author: Carl
 - [2026-05-12 — Academy-only notification bug fix — `fn_tm_on_message_insert` lacked `access_scope` filter; 27 contaminated rows deleted; fix confirmed live via migration `20260511071820`; deprecated `messages` pipeline documented](audit/2026-05-12-academy-notification-bug-fix.md) · tag: `audit-2026-05-12-academy-notification-bug-fix` · author: Khian (Brian)
 - [2026-05-11 — PDP views security_invoker fix — v_pdp_user_currency and v_pdp_cycle_summary ran as DB owner, bypassing RLS on all four underlying tables; security_invoker=true applied, verified live; manager policy gap flagged to Angela](audit/2026-05-11-pdp-views-security-invoker-fix.md) · tag: `audit-2026-05-11-pdp-views-security-invoker-fix` · author: Khian (Brian)
 - [2026-05-11 — BUG-018 email delivery investigation — confirmed non-issue; Mailgun delivered successfully (2.0.0 OK), email landed in Gmail Promotions tab; same-browser session conflict during QA also a non-bug](audit/2026-05-11-bug-018-email-delivery-investigation.md) · tag: `audit-2026-05-11-bug-018-email-delivery-investigation` · author: Khian (Brian)
