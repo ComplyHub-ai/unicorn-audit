@@ -11,6 +11,7 @@ Newest first.
 
 ### May
 
+- [2026-05-12 — Academy-only notification bug fix — `fn_tm_on_message_insert` lacked `access_scope` filter; 27 contaminated rows deleted; fix confirmed live via migration `20260511071820`; deprecated `messages` pipeline documented](audit/2026-05-12-academy-notification-bug-fix.md) · tag: `audit-2026-05-12-academy-notification-bug-fix` · author: Khian (Brian)
 - [2026-05-11 — PDP views security_invoker fix — v_pdp_user_currency and v_pdp_cycle_summary ran as DB owner, bypassing RLS on all four underlying tables; security_invoker=true applied, verified live; manager policy gap flagged to Angela](audit/2026-05-11-pdp-views-security-invoker-fix.md) · tag: `audit-2026-05-11-pdp-views-security-invoker-fix` · author: Khian (Brian)
 - [2026-05-11 — BUG-018 email delivery investigation — confirmed non-issue; Mailgun delivered successfully (2.0.0 OK), email landed in Gmail Promotions tab; same-browser session conflict during QA also a non-bug](audit/2026-05-11-bug-018-email-delivery-investigation.md) · tag: `audit-2026-05-11-bug-018-email-delivery-investigation` · author: Khian (Brian)
 - [2026-05-11 — BUG-011/019 login routing timeout fix — staff and full-access users routed to Academy fallback; profile load race condition in useUserAccess.ts; single-line fix, commit 893fc01a](audit/2026-05-11-bug-011-019-login-routing-timeout.md) · tag: `audit-2026-05-11-bug-011-019-login-routing-timeout` · author: Khian (Brian)
