@@ -9,6 +9,10 @@ Newest first.
 
 ## 2026
 
+### June
+
+- [2026-06-02 — Governance Documents dedup fix — `v_client_governance_documents` rewritten with `ROW_NUMBER()` to deduplicate to one row per `(tenant_id, document_id)`, latest non-cancelled `package_instance` wins; eliminated 5,231 duplicate groups / 6,785 extra rows platform-wide affecting 170+ tenants; root cause: `start_client_package` does not supersede prior `document_instances` on package transition or annual renewal — view fix resolves client-visible symptom; 1 migration, view replacement only, no frontend or schema changes](audit/2026-06-02-governance-documents-dedup-fix.md) · tag: `audit-2026-06-02-governance-documents-dedup-fix` · author: Carl
+
 ### May
 
 - [2026-05-31 — Invitation flow & Cohort Sender fixes — ghost user UUID preservation confirmed; Cohort Sender added to nav; Manage Invites 3 bugs fixed (expiry 24h→7d, ghost verified, re-invite button); `activate-ghost-user` returns `action_link` on email block; cohort job results: copy link column, tenant names, null tenant guard; `invite-user` skip_email now stamps `tenant_id`; `v_auth_user_state` COALESCE fallback via `tenant_users` (26→4 invisible ghosts); smoke tested end-to-end; 3 migrations, 3 edge functions, 4 frontend files](audit/2026-05-31-invitation-flow-cohort-sender-fixes.md) · tag: `audit-2026-05-31-invitation-flow-cohort-sender-fixes` · author: Khian (Brian)
