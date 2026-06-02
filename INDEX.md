@@ -9,6 +9,10 @@ Newest first.
 
 ## 2026
 
+### June
+
+- [2026-06-03 — Invitation flow complete — test user deleted; Demo RTO + 2 ghost users created; Cohort Sender per-row selection + `launch_cohort_job` extended with `p_include_uuids`; Manage Invites Copy link button; Mailgun webhook integration (`delivery_status`, `delivery_event_at`; HMAC-SHA256 verification; Bounced/Delivery failed/Spam report badges + filters); `activate-ghost-user` now captures `mailgun_message_id`; `resend-invite` 4 bug fixes (wrong body, 24h→7d expiry, wrong VIVACITY_TENANT_ID, delivery_status not cleared) + `skip_email` support; Manage Invites stat cards + filter consistency fixed (`is_in_auth`); expired invites no longer bleed into pending filter; 3 migrations, 3 edge functions, 2 frontend files](audit/2026-06-03-invitation-flow-complete.md) · tag: `audit-2026-06-03-invitation-flow-complete` · author: Khian (Brian)
+
 ### May
 
 - [2026-05-31 — Invitation flow & Cohort Sender fixes — ghost user UUID preservation confirmed; Cohort Sender added to nav; Manage Invites 3 bugs fixed (expiry 24h→7d, ghost verified, re-invite button); `activate-ghost-user` returns `action_link` on email block; cohort job results: copy link column, tenant names, null tenant guard; `invite-user` skip_email now stamps `tenant_id`; `v_auth_user_state` COALESCE fallback via `tenant_users` (26→4 invisible ghosts); smoke tested end-to-end; 3 migrations, 3 edge functions, 4 frontend files](audit/2026-05-31-invitation-flow-cohort-sender-fixes.md) · tag: `audit-2026-05-31-invitation-flow-cohort-sender-fixes` · author: Khian (Brian)
