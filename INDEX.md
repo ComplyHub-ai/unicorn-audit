@@ -11,6 +11,7 @@ Newest first.
 
 ### June
 
+- [2026-06-05 — Role backfill: primary/secondary contacts — `tenant_users.role` corrected `child→parent` (369 rows) and `tenant_members.role` corrected `General User→Admin` (367 rows) for all primary and secondary contacts platform-wide; root cause: May 2025 initial data import applied `role='child'` universally; 6 users were actively signed in with wrong permissions; prior fixes (2026-05-06, 2026-05-12, 2026-05-26) addressed subsets only; verification: 0 remaining wrong rows; open: `activate-ghost-user` does not apply role mapping at activation time — future ghost activations will re-introduce the problem until edge function is patched](audit/2026-06-05-role-backfill-primary-secondary-contacts.md) · tag: `audit-2026-06-05-role-backfill-primary-secondary-contacts` · author: Carl
 - [2026-06-02 — Governance Documents dedup fix — `v_client_governance_documents` rewritten with `ROW_NUMBER()` to deduplicate to one row per `(tenant_id, document_id)`, latest non-cancelled `package_instance` wins; eliminated 5,231 duplicate groups / 6,785 extra rows platform-wide affecting 170+ tenants; root cause: `start_client_package` does not supersede prior `document_instances` on package transition or annual renewal — view fix resolves client-visible symptom; 1 migration, view replacement only, no frontend or schema changes](audit/2026-06-02-governance-documents-dedup-fix.md) · tag: `audit-2026-06-02-governance-documents-dedup-fix` · author: Carl
 
 ### May
