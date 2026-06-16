@@ -63,11 +63,22 @@ edits to `TenantUsersTab`, `ClientUsersPage`, `InviteUserDialog`.
 - Vivacity team see the pill in `TenantUsersTab` but Invite button stays enabled
   (mirrors edge-function bypass).
 
+## Follow-up: Vivacity unlimited override
+
+14 external clients share M-AM — changing the package-level limit was not an option.
+`package_instances.is_unlimited_override boolean NOT NULL DEFAULT false` added.
+`get_tenant_user_capacity` short-circuits to `is_unlimited = true` when any active root
+instance for the tenant carries `is_unlimited_override = true`. Vivacity Coaching &
+Consulting's M-AM instance (`tenant_id = 6372`) set to `is_unlimited_override = true`.
+Verified: `get_tenant_user_capacity(6372)` returns `is_unlimited = true`.
+
+Migration `20260616071634_f1542ec4-ebcd-407b-989a-611b0e7f9b3b.sql` at
+unicorn @ `c30eef30`.
+
 ## Open questions parked
 
-- Tenant 6372 (Vivacity Coaching & Consulting) is 1 over the M-AM default cap of 5.
-  Decision needed: set `packages.user_limit = NULL` for M-AM, or set a higher number,
-  or leave as-is (staff bypass makes it functional for Vivacity-originated invites).
+- D/E edge function smoke test (at-cap rejection vs Vivacity SA bypass) still pending
+  manual UI verification — no auth session available during this session.
 - `TenantUsersTab` query still doesn't fetch `relationship_role` — the display bug
   identified 2026-06-11 (shows academy_user as "User") is still outstanding as a
   separate Lovable fix.
