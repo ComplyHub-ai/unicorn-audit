@@ -11,6 +11,8 @@ Newest first.
 
 ### June
 
+- [2026-06-16 — Tasks overhaul (Phases 1–4) — unified `client_action_items` model: `published_action_item_id` FK on CTI, RLS split on CAI + comments (staff full CRUD / portal scoped), column-guard trigger, dashboard double-count fix, `rpc_publish_stage_tasks` SECURITY DEFINER RPC, unified portal Tasks view (My/All tabs, inline status), Publish button in `PackageStagesManager`; 7 migrations; Phase 5 (legacy deprecation) deferred](audit/2026-06-16-tasks-overhaul.md) · tag: `audit-2026-06-16-tasks-overhaul` · author: Carl
+
 - [2026-06-11 — `last_sign_in_at` insert sync — new `trg_sync_last_sign_in_on_insert` (`AFTER INSERT ON public.users`, `SECURITY DEFINER`) syncs `last_sign_in_at` from `auth.users` at row creation; fixes race condition where first-time activation creates `public.users` AFTER auth sign-in sets the timestamp; 26 users backfilled; `handle_user_login` (UPDATE path) unchanged; 1 migration `20260611062316`](audit/2026-06-11-last-sign-in-insert-sync.md) · tag: `audit-2026-06-11-last-sign-in-insert-sync` · author: Carl
 
 - [2026-06-11 — 0-minute time entries — `AddTimeDialog.tsx:401` + `EditTimeDialog.tsx:255` guards changed `<= 0` → `< 0`; `v_client_package_hours_recent` updated to remove `duration_minutes > 0` filter so 0-minute activity records surface in Recent Work; 10 pre-existing 0-minute entries now visible; all hour-aggregation surfaces unaffected; 1 migration `20260611060223`, 2 frontend files](audit/2026-06-11-zero-minute-time-entries.md) · tag: `audit-2026-06-11-zero-minute-time-entries` · author: Carl
