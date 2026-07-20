@@ -1,7 +1,7 @@
 # Audit: 2026-07-20 — academy lesson outline rls fix
 
-**Trigger:** ad-hoc — client (Think Real Estate, tenant 7541) reported Vivacity Academy courses showing no lesson/video count until enrolling
-**Scope:** RLS visibility on `academy_courses` / `academy_modules` / `academy_lessons` for non-enrolled authenticated users. Did **not** touch `academy_assessments`, `academy_enrollments`, `academy_certificates`, or any other table's grants/RLS.
+**Trigger:** ad-hoc — client (Think Real Estate, tenant 7541) reported Vivacity Academy courses showing no lesson/video count until enrolling. Reopened same day when Carl spot-checked the Demo RTO account (tenant 7547) and still saw 0 lessons on unenrolled course *browse* cards (distinct surface from the course *detail* page fixed in the first pass).
+**Scope:** RLS visibility on `academy_courses` / `academy_modules` / `academy_lessons` for non-enrolled authenticated users, plus every client-portal frontend query reading lesson rows for a non-enrolled-facing surface. Did **not** touch `academy_assessments`, `academy_enrollments`, `academy_certificates`, or any other table's grants/RLS.
 **Session owner:** Carl
 **Supabase project:** `yxkgdalkbrriasiyyrwk` — Unicorn 2.0 prod
 
@@ -17,6 +17,7 @@
 - The 25 June migration's enrolment predicate also had a latent correctness gap unrelated to the reported bug: it checked only `e.user_id = auth.uid()`, with no `status`/`revoked_at`/`expires_at` filter. Verified live data (527 enrolments: 512 `active`, 15 `completed`, 0 revoked/expired) before tightening the predicate, to guarantee zero users lose access as a side effect.
 - Caught mid-review: Lovable's first implementation draft added a `get_lesson_content` SECURITY DEFINER RPC and a matching `AcademyLessonViewerPage.tsx` split to serve gated lesson content to a "wider" audience — unnecessary, since that page's audience (staff/enrolled/preview) is identical to what the corrected base-table policy already admits for the full row. Sent back for simplification; final version has zero RPC and touches exactly one frontend file.
 - Caught mid-review: Lovable's own verification queries in an earlier draft were plain `SELECT`s that would run with RLS-bypassing privileges (service_role/postgres) and prove nothing regardless of policy correctness. Corrected to use a `SET ROLE authenticated` + `set_config('request.jwt.claims', …)` transaction wrapper, independently re-run by Carl before and after deploy.
+- **Second wave, same day:** the first pass's "codebase observations" incorrectly cleared `useAcademyCourses.ts` as unaffected. Carl spot-checked the Demo RTO account (tenant 7547) post-deploy and still saw "0 lessons" — this time on the course *browse/hub* page (`AudienceHubPage.tsx`), not the detail page. Root cause: `useAcademyCourses.ts`'s lesson-count query (`.from("academy_lessons").select("course_id")...`) was never switched to the new view — it powers a different surface than `useModulesWithLessons` and was missed in the first implementation and in the first codebase-observations pass. A second grep for every `.from("academy_lessons")` in the client portal (not just the two files already touched) found one more instance of the identical pattern: `AcademyLessonViewerPage.tsx`'s sidebar module/lesson query (used to render the lesson list for navigation), which would under-list lessons for a non-enrolled visitor on a preview lesson. Both fixed by switching `.from()` to `v_academy_lesson_outline` — no DB/RLS/migration change needed since the view already existed and already had every column both queries used. Two other candidates surfaced by the grep (`ReflectionsTab.tsx:38`, `EvidenceSheet.tsx:277`) were reviewed and left as-is: both only ever resolve data for lessons the querying user is already enrolled in or has completed (progress-row-gated / evidence-match-gated), so the worst case is a blank title or a graceful fallback to course-level `estimated_minutes`, not a functional break.
 
 ## DB changes shipped
 
@@ -31,6 +32,10 @@
   - Completed-status enrollee (`91481df0-…`) vs course 3: `lessons_via_base=48, lessons_via_view=48, content_readable=48` — full access unchanged from pre-deploy baseline.
   - The actual affected user (tenant 7541 primary contact, `978c23d0-…`, active enrolment on course 23): `lessons_via_base=6, content_readable=6` — sees full lesson content end-to-end.
   - Pre-deploy baseline (same non-enrolled user, before migration applied): `modules=0, lessons=0, course_visible=1` — reproduced the reported bug exactly before fixing it.
+- `unicorn-cms-f09c59e5 @ 93308988` — no migration, frontend-only follow-up:
+  - `src/hooks/useAcademyCourses.ts`: lesson-count query switched `.from("academy_lessons")` → `.from("v_academy_lesson_outline")`.
+  - `src/pages/client/AcademyLessonViewerPage.tsx`: sidebar module/lesson query switched `.from("academy_lessons")` → `.from("v_academy_lesson_outline")`.
+  - Re-verified independently by Carl: non-enrolled Demo RTO child user (`a14751f4-…`) vs course 1 — `lessons_via_view=105, lessons_via_base=0` — matches what `useAcademyCourses` will now read (the view), confirming the "0 lessons" browse-card bug is resolved for this surface too.
 
 ## KB changes shipped
 
@@ -39,7 +44,8 @@
 ## Codebase observations (read-only)
 
 - `unicorn-cms-f09c59e5 @ 9d3ecad9`: also touched `src/hooks/academy/useAcademyModulesLessons.ts` (lesson query in `useModulesWithLessons` switched from `.from("academy_lessons")` to `.from("v_academy_lesson_outline")`, dropped `content_markdown`/`video_id`/`resource_id` from its select + made those fields optional on the `AcademyLesson` interface) and `src/integrations/supabase/types.ts` (regenerated). Diffed the full commit against the prior tip (`6ba1bdcd`) to confirm no unrelated scope creep — exactly these 3 files changed.
-- `AcademyLessonViewerPage.tsx`, `useMyEnrolledCourses.ts`, `useAcademyCourses.ts`, and all admin builder hooks (`useAdminAcademyCourses`, `LessonEditorPanel`, `ImportVideosPanel`, `useAcademyAssessmentBuilder`, `EnrolmentProgressDrawer`) were left untouched — confirmed their existing query shapes are already admitted by the corrected base-table policy (staff bypass, or enrolment for the client pages).
+- **Correction to the first pass:** this section originally (wrongly) cleared `useAcademyCourses.ts` and `AcademyLessonViewerPage.tsx`'s sidebar query as "already admitted by the corrected base-table policy." That was true for `AcademyLessonViewerPage`'s per-lesson content reads but not for its sidebar list, and not true at all for `useAcademyCourses.ts` — both read lesson rows for a non-enrolled-facing surface and needed the same view switch. See the second-wave findings/DB-changes entries above (`unicorn-cms-f09c59e5 @ 93308988`). Root cause of missing it the first time: the review checked "is this audience already admitted by the base-table policy," which is the right question for content reads, but didn't separately check "does this specific query need to work for a *non-enrolled* audience at all" for every consumer — the two are different questions and conflating them is what let this slip through.
+- `useMyEnrolledCourses.ts` and all admin builder hooks (`useAdminAcademyCourses`, `LessonEditorPanel`, `ImportVideosPanel`, `useAcademyAssessmentBuilder`, `EnrolmentProgressDrawer`) remain correctly left untouched — confirmed their existing query shapes are already admitted by the corrected base-table policy (staff bypass, or enrolment for the client pages) and none of them serve a non-enrolled-facing surface.
 
 ## Decisions
 
