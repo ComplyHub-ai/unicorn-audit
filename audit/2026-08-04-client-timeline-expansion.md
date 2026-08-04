@@ -1,7 +1,7 @@
 # Audit: 2026-08-04 — Client Timeline expansion (notes, logins, messages, Academy, stage progression, page views)
 
 **Trigger:** ad-hoc — schema/trigger changes shipped as hand-written `unicorn-cms-f09c59e5` hotfixes (not routed through Lovable), audit entry required per workspace-root `CLAUDE.md → Lovable production DB change sessions` regardless of route.
-**Scope:** Six phases extending the existing client Timeline feature (`client_timeline_events`) into a comprehensive activity feed per Carl's request — CSC notes (including a previously-unlinked legacy notes system), client-portal logins, client↔CSC messages, Vivacity Academy engagement, stage progression status changes (added mid-session on Carl's follow-up ask), and net-new client-portal page-view tracking. All six feed the Ask Viv Assistant RAG corpus for free, since `client_timeline_events` was already a registered ingestion source in `embed-ask-viv-corpus`.
+**Scope:** Six phases extending the existing client Timeline feature (`client_timeline_events`) into a comprehensive activity feed per Carl's request — CSC notes (including a previously-unlinked legacy notes system), client-portal logins, client↔CSC messages, Vivacity Academy engagement, stage progression status changes (added mid-session on Carl's follow-up ask), and net-new client-portal page-view tracking. All six feed the Ask Viv Assistant RAG corpus for free, since `client_timeline_events` was already a registered ingestion source in `embed-ask-viv-corpus`. Plus a same-session post-ship correction (PR #139) after Carl reported a note wasn't appearing in the Timeline.
 
 ## Findings
 
@@ -38,6 +38,12 @@
 - **Known accepted limitation**: the last page of a browser session (tab closed, no further navigation) never gets its duration closed out — documented in the hook's code comment rather than worked around with a `sendBeacon`-based approach (which can't carry Supabase auth headers).
 - Attempted to regenerate `src/integrations/supabase/types.ts` for the new table/RPC via the Supabase MCP tool; the full output (2.5M+ characters, whole-schema dump) wasn't practical to reconcile by hand this session, and `tsc --noEmit` already passes without it. Left as a minor follow-up for the next full type regen.
 
+### Post-ship correction — Phase A targeted the wrong table (`hotfix/timeline-fix-notes-table-wiring`, PR #139)
+- Carl reported a note added via the "Structured Notes" tab (`ClientStructuredNotesTab.tsx`) wasn't appearing in the Timeline. Investigation found Phase A's trigger was wired onto `public.documents_notes` based on research that conflated it with the table that UI actually uses. Confirmed `documents_notes` has **zero rows and zero code references anywhere** in `src/` or `supabase/functions/` — a completely dead table. The real table (via `useNotes.tsx`) is `public.notes`.
+- Fixed: retired the dead trigger/function, added the real one on `public.notes` (same event type, `structured_note_added`), and backfilled recent notes so already-existing activity shows up retroactively.
+- **Second surprise caught mid-fix**: `public.notes` turned out to hold the full "Unicorn 1" (predecessor system) legacy migration history — **11,340 rows spanning 2014–2026 across 357 tenants**, not just recent CSC notes. An unscoped backfill was run first, found to be far larger than intended (would have flooded every tenant's timeline and the Ask Viv RAG corpus with over a decade of migration-era notes), rolled back cleanly (backfilled rows tagged `metadata.backfilled = true` for easy identification/deletion), and redone scoped to the last 90 days (793 rows / 69 tenants) per Carl's explicit direction after being asked rather than assumed.
+- Verified both originally-reported notes (Carl's test note and a Cloudflare onboarding email-imported note, tenant 7547) now appear correctly.
+
 ### Cross-cutting
 - All six event types added to both the DB `CHECK` constraint (`timeline_valid_event_type`) and `src/types/timeline.ts`'s `TIMELINE_EVENT_TYPES`, plus icon/colour maps, filter chips, and (where relevant) deep links in `TimelineEventCard.tsx` / `ClientTimelineTab.tsx` / `useClientManagementData.tsx`.
 - Every migration verified end-to-end against live QA data (Test RTO A, tenant 7517) before merging — real inserts/updates triggered, correct timeline rows confirmed, test data cleaned up and original state restored each time (including a stash-and-recover of an unrelated in-progress WIP branch found at session start, left untouched at the user's request until they'd committed it themselves).
@@ -48,15 +54,16 @@
 
 ## Codebase observations (read-only)
 
-- unicorn-cms-f09c59e5 @ `91073ebc` (main, post-merge of PRs #133–#138).
+- unicorn-cms-f09c59e5 @ `82fa95e2` (main, post-merge of PRs #133–#139).
 - Migrations applied to prod (Supabase project `yxkgdalkbrriasiyyrwk`) this session, in order:
-  - `20260804010000_wire_documents_notes_into_timeline.sql`
+  - `20260804010000_wire_documents_notes_into_timeline.sql` — superseded by the fix below; the trigger it created was retired same session.
   - `20260804020000_client_login_timeline_event.sql`
   - `20260804030000_tenant_message_timeline_event.sql` — includes the `client_timeline_events_source_check` stale-constraint fix.
   - `20260804040000_academy_activity_timeline_events.sql`
   - `20260804050000_stage_instance_status_timeline_event.sql`
   - `20260804060000_client_portal_page_view_tracking.sql` — new table `client_portal_page_views`, new RPC `rpc_log_page_view`, new function `fn_generate_portal_activity_digest`, new `pg_cron` job `portal-activity-digest-daily`.
-- New/modified triggers on production tables: `documents_notes`, `auth.users` (extended `handle_user_login`, not new), `tenant_messages`, `academy_enrollments`, `academy_lesson_progress`, `academy_certificates`, `stage_instances`.
+  - `20260804070000_fix_notes_table_timeline_wiring.sql` — retires the dead `documents_notes` trigger, wires `public.notes` (the real table) instead, backfills last-90-days notes (793 rows / 69 tenants) after an unscoped first attempt (11,340 rows / 357 tenants) was rolled back.
+- New/modified triggers on production tables: `public.notes` (real, per the fix — `documents_notes`'s trigger was retired same session, targeted a confirmed-dead table), `auth.users` (extended `handle_user_login`, not new), `tenant_messages`, `academy_enrollments`, `academy_lesson_progress`, `academy_certificates`, `stage_instances`.
 - New RLS: `client_portal_page_views` (staff tenant-scoped SELECT only; all writes via SECURITY DEFINER RPC, no direct grant).
 
 ## Decisions
@@ -67,6 +74,8 @@
 - Phase E scope: does "stage progression" refer to `stage_instances` (wired in) or `client_package_stage_state` (not wired in, no UI found driving it)? Flagged in PR #137, awaiting Carl's response.
 - Whether any Microsoft-sync edge function code paths silently swallowed the now-fixed `source` CHECK constraint violation historically (Phase C finding) — worth a follow-up check for missing historical Microsoft-sourced timeline events.
 - `src/integrations/supabase/types.ts` not regenerated for the Phase F table/RPC (impractical output size this session) — pick up on the next full type regen.
+- `public.notes` titles/bodies contain raw HTML markup (e.g. `<p>testing note timeline</p>`) rendered as-is in the timeline card — cosmetic, not fixed this session.
+- Only a 90-day window of `public.notes` was backfilled into the timeline; the remaining ~10,500 older rows (2014–the 90-day cutoff) stay unreflected unless a future session is asked to extend the window.
 
 ## Tag
 audit-2026-08-04-client-timeline-expansion
