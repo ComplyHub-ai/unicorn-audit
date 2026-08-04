@@ -1,7 +1,7 @@
-# Audit: 2026-08-04 — Client Timeline expansion (notes, logins, messages, Academy, stage progression, page views)
+# Audit: 2026-08-04 — Client Timeline expansion (notes, logins, messages, Academy, stage progression, page views, package status)
 
 **Trigger:** ad-hoc — schema/trigger changes shipped as hand-written `unicorn-cms-f09c59e5` hotfixes (not routed through Lovable), audit entry required per workspace-root `CLAUDE.md → Lovable production DB change sessions` regardless of route.
-**Scope:** Six phases extending the existing client Timeline feature (`client_timeline_events`) into a comprehensive activity feed per Carl's request — CSC notes (including a previously-unlinked legacy notes system), client-portal logins, client↔CSC messages, Vivacity Academy engagement, stage progression status changes (added mid-session on Carl's follow-up ask), and net-new client-portal page-view tracking. All six feed the Ask Viv Assistant RAG corpus for free, since `client_timeline_events` was already a registered ingestion source in `embed-ask-viv-corpus`. Plus a same-session post-ship correction (PR #139) after Carl reported a note wasn't appearing in the Timeline.
+**Scope:** Seven phases extending the existing client Timeline feature (`client_timeline_events`) into a comprehensive activity feed per Carl's request — CSC notes (including a previously-unlinked legacy notes system), client-portal logins, client↔CSC messages, Vivacity Academy engagement, stage progression status changes (added mid-session on Carl's follow-up ask), net-new client-portal page-view tracking, and package status transitions (added in a later same-day session, prompted by a Governance Documents visibility investigation). All feed the Ask Viv Assistant RAG corpus for free, since `client_timeline_events` was already a registered ingestion source in `embed-ask-viv-corpus`. Plus a same-session post-ship correction (PR #139) after Carl reported a note wasn't appearing in the Timeline.
 
 ## Findings
 
@@ -38,6 +38,14 @@
 - **Known accepted limitation**: the last page of a browser session (tab closed, no further navigation) never gets its duration closed out — documented in the hook's code comment rather than worked around with a `sendBeacon`-based approach (which can't carry Supabase auth headers).
 - Attempted to regenerate `src/integrations/supabase/types.ts` for the new table/RPC via the Supabase MCP tool; the full output (2.5M+ characters, whole-schema dump) wasn't practical to reconcile by hand this session, and `tsc --noEmit` already passes without it. Left as a minor follow-up for the next full type regen.
 
+### Phase G — package status transitions (`hotfix/package-status-timeline-event`, PR #149)
+- Added in a separate session, prompted by investigating why Start Training Group's client portal showed no Governance Documents despite ~150 generated documents existing. Root cause of that report: the client portal's `v_client_governance_documents` view only surfaces documents whose package instance has `membership_state = 'active'`; the tenant's package was migrated (cancelled) and its replacement completed within a few days by Dave (`dave@vivacity.com.au`, per `package_instance_state_log`), leaving zero active package instances and no documents visible in the portal. That view-visibility gap is a separate, already-flagged issue and is **not** fixed by this phase.
+- Tracing that migration surfaced a real audit gap: `package_instances.membership_state` changes were only logged (`package_instance_state_log`, via the `transition_membership_state` RPC) when made through the proper cancel/hold/finalise UI flows in `ClientPackagesTab.tsx` — and even then, the RPC's audit log was the only trail; the Timeline itself only got an entry if staff completed a manually pre-filled note on a redirected page (cancel/hold), and got nothing at all for finalise/resume. Worse, the raw admin edit screen (`PackageDataManager.tsx`'s "mark complete" toggle) bypassed `transition_membership_state` entirely via a direct `.update()`, leaving **zero** trail (no log row, no timeline entry, no reason, no actor) — confirmed as exactly what happened to one of Start Training Group's package instances.
+- Fix, following the Phase E (`stage_status_changed`) pattern exactly: new trigger `fn_package_instance_timeline_trigger` on `public.package_instances` (`AFTER UPDATE OF membership_state`), new event type `package_status_changed`, internal-only. Trigger-based rather than embedded in the RPC so every write path is covered regardless of caller, closing the raw-edit bypass at the source.
+- Additionally routed `PackageDataManager.tsx`'s complete-toggle through `transition_membership_state` (per Carl's explicit direction) so that path also gets a `package_instance_state_log` entry (reason + actor), not just a Timeline row — the trigger alone would have logged the transition but not the reason/actor, which only the RPC's own audit table captures.
+- Removed the now-redundant manual note-redirect from `ClientPackagesTab.tsx`'s cancel/hold handlers (per Carl's explicit direction) — replaced with `onRefresh?.()`, matching the pattern already used by `handleResumePackage`. The automatic trigger-based entry made the manual step both unreliable (skippable) and redundant.
+- Verified live: trigger confirmed present and enabled (`pg_trigger.tgenabled = 'O'`) on `package_instances` immediately after migration apply. Not yet exercised end-to-end against a live cancel/hold/finalise/PackageDataManager-complete action this session — flagged as an open test-plan item on the PR.
+
 ### Post-ship correction — Phase A targeted the wrong table (`hotfix/timeline-fix-notes-table-wiring`, PR #139)
 - Carl reported a note added via the "Structured Notes" tab (`ClientStructuredNotesTab.tsx`) wasn't appearing in the Timeline. Investigation found Phase A's trigger was wired onto `public.documents_notes` based on research that conflated it with the table that UI actually uses. Confirmed `documents_notes` has **zero rows and zero code references anywhere** in `src/` or `supabase/functions/` — a completely dead table. The real table (via `useNotes.tsx`) is `public.notes`.
 - Fixed: retired the dead trigger/function, added the real one on `public.notes` (same event type, `structured_note_added`), and backfilled recent notes so already-existing activity shows up retroactively.
@@ -54,7 +62,7 @@
 
 ## Codebase observations (read-only)
 
-- unicorn-cms-f09c59e5 @ `82fa95e2` (main, post-merge of PRs #133–#139).
+- unicorn-cms-f09c59e5 @ `82fa95e2` (main, post-merge of PRs #133–#139). Phase G's PR #149 (`hotfix/package-status-timeline-event`) is **open, not yet merged** as of this audit draft — migration already applied live to prod regardless (per this workspace's standing "hotfix migrations apply directly, merge gate is separate" practice); update this SHA once #149 merges.
 - Migrations applied to prod (Supabase project `yxkgdalkbrriasiyyrwk`) this session, in order:
   - `20260804010000_wire_documents_notes_into_timeline.sql` — superseded by the fix below; the trigger it created was retired same session.
   - `20260804020000_client_login_timeline_event.sql`
@@ -63,7 +71,8 @@
   - `20260804050000_stage_instance_status_timeline_event.sql`
   - `20260804060000_client_portal_page_view_tracking.sql` — new table `client_portal_page_views`, new RPC `rpc_log_page_view`, new function `fn_generate_portal_activity_digest`, new `pg_cron` job `portal-activity-digest-daily`.
   - `20260804070000_fix_notes_table_timeline_wiring.sql` — retires the dead `documents_notes` trigger, wires `public.notes` (the real table) instead, backfills last-90-days notes (793 rows / 69 tenants) after an unscoped first attempt (11,340 rows / 357 tenants) was rolled back.
-- New/modified triggers on production tables: `public.notes` (real, per the fix — `documents_notes`'s trigger was retired same session, targeted a confirmed-dead table), `auth.users` (extended `handle_user_login`, not new), `tenant_messages`, `academy_enrollments`, `academy_lesson_progress`, `academy_certificates`, `stage_instances`.
+  - `20260804080000_package_instance_status_timeline_event.sql` (Phase G, separate later session) — new trigger on `package_instances`, new event type `package_status_changed`.
+- New/modified triggers on production tables: `public.notes` (real, per the fix — `documents_notes`'s trigger was retired same session, targeted a confirmed-dead table), `auth.users` (extended `handle_user_login`, not new), `tenant_messages`, `academy_enrollments`, `academy_lesson_progress`, `academy_certificates`, `stage_instances`, `package_instances` (Phase G).
 - New RLS: `client_portal_page_views` (staff tenant-scoped SELECT only; all writes via SECURITY DEFINER RPC, no direct grant).
 
 ## Decisions
@@ -76,6 +85,8 @@
 - `src/integrations/supabase/types.ts` not regenerated for the Phase F table/RPC (impractical output size this session) — pick up on the next full type regen.
 - `public.notes` titles/bodies contain raw HTML markup (e.g. `<p>testing note timeline</p>`) rendered as-is in the timeline card — cosmetic, not fixed this session.
 - Only a 90-day window of `public.notes` was backfilled into the timeline; the remaining ~10,500 older rows (2014–the 90-day cutoff) stay unreflected unless a future session is asked to extend the window.
+- Phase G not yet exercised end-to-end against a live cancel/hold/finalise/PackageDataManager-complete action — trigger confirmed present and enabled, but no real `package_status_changed` row has been observed yet. Do this before or as part of merging PR #149.
+- Phase G's underlying trigger — the `v_client_governance_documents` view hiding all documents for a tenant with zero *active* package instances — is a separate, real bug (also affects Australian National Education College and Yarra College Australia per a live scope check) and remains unfixed. Flagged to Carl during the investigation; not actioned this session pending his decision on the fix approach.
 
 ## Tag
 audit-2026-08-04-client-timeline-expansion
